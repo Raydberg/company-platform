@@ -2,7 +2,7 @@ spring:
   application:
     name: gateway
   profiles:
-    default: default
+    default: eureka-on
 server:
   port: 9292
 eureka:
@@ -11,3 +11,5 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
+#  instance:
+#    instance-id: "${spring.application.name}:${random.value}"

@@ -22,4 +22,4 @@ eureka:
 server:
   servlet:
     context-path: /msvc-report-ms
-  port: 7070
+  port: 0
