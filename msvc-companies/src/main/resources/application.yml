@@ -8,8 +8,8 @@ spring:
     username: ${db.username}
     password: ${db.password}
     hikari:
-      connection-timeout: ${db.connection-timeout}
-      maximum-pool-size: ${db.maximum-pool-size}
+      connection-timeout: ${db.connection-timeout:20000}
+      maximum-pool-size: ${db.maximum-pool-size:5}
   devtools:
     restart:
       enabled: true

@@ -55,12 +55,14 @@ services:
     restart: always
     ports:
       - '8761:8761'
-    depends_on:
-      config-server:
-        condition: service_healthy
     environment:
-      - SPRING_PROFILE_ACTIVE=dev
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:7777
+      - SPRING_PROFILES_ACTIVE=dev
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   msvc-companies:
     build:
@@ -74,11 +76,16 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - db-postgresql
-      - eureka-server
+      db-postgresql:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/company-db
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:7777
 
 
   msvc-fallback:
@@ -115,6 +122,28 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/company-db
 
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile-dev
+    container_name: gateway-dev
+    restart: always
+    volumes:
+      - ./gateway/src:/app/src
+      - ./gateway/target:/app/target
+    ports:
+      - '9292:9292'
+      - '5005:5005'
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:7777
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.3
     container_name: load-balancer
@@ -141,9 +170,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
-
-
-
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.82.0
@@ -212,3 +238,25 @@ services:
     restart: always
     ports:
       - "9411:9411"
+
+#  sonarqube:
+#    image: sonarqube:10.3-community
+#    container_name: sonarqube-dev
+#    restart: always
+#    environment:
+#      - SONAR_JDBC_URL=jdbc:postgresql://db-postgresql:5432/sonar
+#      - SONAR_JDBC_USERNAME=company
+#      - SONAR_JDBC_PASSWORD=2025
+#      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+#    ports:
+#      - "9000:9000"
+#    depends_on:
+#      - db-postgresql
+#    volumes:
+#      - sonarqube_data:/opt/sonarqube/data
+#      - sonarqube_extensions:/opt/sonarqube/extensions
+#      - sonarqube_logs:/opt/sonarqube/logs
+#volumes:
+#  sonarqube_data:
+#  sonarqube_extensions:
+#  sonarqube_logs:

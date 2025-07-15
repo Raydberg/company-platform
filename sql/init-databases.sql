@@ -3,6 +3,7 @@ CREATE DATABASE users_db;
 CREATE DATABASE products_db;
 CREATE DATABASE orders_db;
 CREATE DATABASE notifications_db;
+-- CREATE DATABASE sonar;
 
 CREATE USER company_user WITH PASSWORD '2025';
 CREATE USER users_user WITH PASSWORD '2025';
@@ -15,3 +16,4 @@ GRANT ALL PRIVILEGES ON DATABASE users_db TO users_user;
 GRANT ALL PRIVILEGES ON DATABASE products_db TO products_user;
 GRANT ALL PRIVILEGES ON DATABASE orders_db TO orders_user;
 GRANT ALL PRIVILEGES ON DATABASE notifications_db TO notifications_user;
+-- GRANT ALL PRIVILEGES ON DATABASE sonar to company;

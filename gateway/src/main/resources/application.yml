@@ -4,9 +4,10 @@ spring:
   profiles:
     default: default
 server:
-  port: 4040
+  port: 9292
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-    fetch-registry: false
+      defaultZone: http://eureka-server:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
