@@ -1,2 +1,32 @@
-spring.application.name=config-server
+spring:
+  application:
+    name: config-server
+  cloud:
+    discovery:
+      enabled: false
 
+    config:
+      server:
+        native:
+          search-locations: classpath:/config
+server:
+  port: ${CONFIG_SERVER_PORT:7777}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false

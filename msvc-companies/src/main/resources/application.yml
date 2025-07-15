@@ -1,13 +1,15 @@
 spring:
   application:
     name: msvc-companies
+  config:
+    import: optional:configserver:http://localhost:7777
   datasource:
-    url: jdbc:postgresql://localhost:5432/company-db
-    username: company
-    password: 2025
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
     hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 5
+      connection-timeout: ${db.connection-timeout}
+      maximum-pool-size: ${db.maximum-pool-size}
   devtools:
     restart:
       enabled: true
