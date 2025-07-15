@@ -1,15 +1,8 @@
 spring:
   application:
-    name: msvc-companies
+    name: msvc-report-ms
   config:
     import: optional:configserver:http://localhost:7777
-  datasource:
-    url: ${db.url}
-    username: ${db.username}
-    password: ${db.password}
-    hikari:
-      connection-timeout: ${db.connection-timeout:20000}
-      maximum-pool-size: ${db.maximum-pool-size:5}
   devtools:
     restart:
       enabled: true
@@ -19,10 +12,7 @@ spring:
       exclude: static/**,public/**,resources/**
     livereload:
       enabled: true
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
 eureka:
   instance:
     instance-id: "${spring.application.name}:${random.value}"
@@ -31,5 +21,5 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 server:
   servlet:
-    context-path: /msvc-companies
-  port: 0
+    context-path: /msvc-report-ms
+  port: 7070
