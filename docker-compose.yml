@@ -1,0 +1,31 @@
+services:
+
+  db:
+    image: postgres:16.1
+    container_name: db-companies
+    restart: always
+    volumes:
+      - ./sql/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/data.sql
+    environment:
+      POSTGRES_DB: 'company-db'
+      POSTGRES_USER: 'company'
+      POSTGRES_PASSWORD: '2025'
+    ports:
+      - '5432:5432'
+  msvc-companies:
+    build:
+      context: ./msvc-companies
+      dockerfile: Dockerfile-dev
+    container_name: msvc-companies-dev
+    restart: always
+    volumes:
+      - ./msvc-companies/src:/app/src
+      - ./msvc-companies/target:/app/target
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/company-db

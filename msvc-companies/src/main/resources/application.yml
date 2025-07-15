@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: msvc-companies
+  datasource:
+    url: jdbc:postgresql://localhost:5432/company-db
+    username: company
+    password: 2025
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 500
+      quiet-period: 100
+      additional-paths: src/main/java
+      exclude: static/**,public/**,resources/**
+    livereload:
+      enabled: true
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+eureka:
+  instance:
+    instance-id: "${spring.application.name}:${random.value}"
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
