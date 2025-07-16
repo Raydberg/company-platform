@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: msvc-fallback
+
+eureka:
+  instance:
+    instance-id: "${spring.application.name}:${random.value}"
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  servlet:
+    context-path: /msvc-fallback
+  port: 8787

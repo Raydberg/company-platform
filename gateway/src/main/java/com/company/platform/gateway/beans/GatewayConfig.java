@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.util.Set;
+
 
 @Configuration
 public class GatewayConfig {
@@ -40,6 +42,37 @@ public class GatewayConfig {
                 ).route(
                         route -> route.path("/msvc-report-ms/**")
                                 .uri("lb://msvc-report-ms")
+                )
+                .build();
+    }
+
+    //Circuit Breaker
+    @Bean
+    @Profile(value = "eureka-on-cb")
+    public RouteLocator routeLocatorEurekaOnCB(RouteLocatorBuilder builder) {
+        return builder
+                .routes()
+                .route(
+                        route -> route.path("/msvc-companies/**")
+                                .filters(filter -> {
+                                    filter.circuitBreaker(config -> config.setName("gateway-cb")
+                                            .setStatusCodes(Set.of("500", "400"))
+                                            //Si falla se ira aqui
+                                            .setFallbackUri("forward:/msvc-fallback/*")
+                                    );
+                                    return filter;
+                                })
+                                .uri("lb://msvc-companies")
+                ).route(
+                        route ->
+                                route
+                                        .path("/msvc-report-ms/**")
+                                        .uri("lb://msvc-report-ms")
+                ).route(
+                        route ->
+                                route
+                                        .path("/msvc-fallback/**")
+                                        .uri("lb://msvc-fallback")
                 )
                 .build();
     }

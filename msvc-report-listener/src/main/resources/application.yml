@@ -1,17 +1,10 @@
 spring:
   application:
-    name: msvc-report-ms
+    name: msvc-report-listener
   config:
     import: optional:configserver:http://localhost:7777
-  devtools:
-    restart:
-      enabled: true
-      poll-interval: 500
-      quiet-period: 100
-      additional-paths: src/main/java
-      exclude: static/**,public/**,resources/**
-    livereload:
-      enabled: true
+  profiles:
+    default: default
   cloud:
     stream:
       kafka:
@@ -20,8 +13,16 @@ spring:
       function:
         bindings:
           #Relaciones de entrada y salidas
-          consumerReport-out-0:
+          # consumerReport-out -> consumer report <- consumerReport-in
+          consumerReport-in-0:
             destination: consumerReport
+  data:
+    mongodb:
+      database: sa
+      username: sa
+      authentication-database: admin
+      host: localhost
+      port: 27017
 eureka:
   instance:
     instance-id: "${spring.application.name}:${random.value}"
@@ -29,6 +30,4 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 server:
-  servlet:
-    context-path: /msvc-report-ms
   port: 0
