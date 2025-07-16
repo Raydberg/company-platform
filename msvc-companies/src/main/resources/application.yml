@@ -34,7 +34,7 @@ eureka:
 server:
   servlet:
     context-path: /msvc-companies
-  port: 0
+  port:
   # Observabilidad
 management:
   tracing:

@@ -14,6 +14,6 @@ FROM openjdk:21-jre-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 9494
+EXPOSE 9093
 
 CMD ["java", "-jar", "app.jar"]

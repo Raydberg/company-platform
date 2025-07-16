@@ -62,7 +62,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 30s
 
   msvc-companies:
     build:
@@ -104,23 +104,78 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
 
-
-  msvc-security:
+  msvc-report-ms:
     build:
-      context: ./msvc-security
+      context: ./msvc-report-ms
       dockerfile: Dockerfile-dev
-    container_name: msvc-security-dev
+    container_name: msvc-report-ms-dev
     restart: always
     volumes:
-      - ./msvc-security/src:/app/src
-      - ./msvc-security/target:/app/target
+      - ./msvc-report-ms/src:/app/src
+      - ./msvc-report-ms/target:/app/target
     ports:
-      - '8082:8082'
+      - '9094:9094'
     depends_on:
-      - db-postgresql
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      config-server:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/company-db
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:7777
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:29092
+
+  msvc-report-listener:
+    build:
+      context: ./msvc-report-listener
+      dockerfile: Dockerfile-dev
+    container_name: msvc-report-listener-dev
+    restart: always
+    volumes:
+      - ./msvc-report-listener/src:/app/src
+      - ./msvc-report-listener/target:/app/target
+    ports:
+      - '9093:9093'
+    depends_on:
+      kafka:
+        condition: service_started
+      mongo-db:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATA_MONGODB_HOST=mongo-db
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=sa
+      - SPRING_DATA_MONGODB_USERNAME=sa
+      - SPRING_DATA_MONGODB_PASSWORD=sa
+      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:7777
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:29092
+
+  #  msvc-security:
+  #    build:
+  #      context: ./msvc-security
+  #      dockerfile: Dockerfile-dev
+  #    container_name: msvc-security-dev
+  #    restart: always
+  #    volumes:
+  #      - ./msvc-security/src:/app/src
+  #      - ./msvc-security/target:/app/target
+  #    ports:
+  #      - '8082:8082'
+  #    depends_on:
+  #      - db-postgresql
+  #    environment:
+  #      - SPRING_PROFILES_ACTIVE=dev
+  #      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-postgresql:5432/company-db
 
   gateway:
     build:
@@ -132,12 +187,10 @@ services:
       - ./gateway/src:/app/src
       - ./gateway/target:/app/target
     ports:
-      - '9292:9292'
+      - '9494:9494'
       - '5005:5005'
     depends_on:
       eureka-server:
-        condition: service_healthy
-      config-server:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=dev
