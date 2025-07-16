@@ -2,6 +2,8 @@ package com.company.platform.msvccompanies.controllers;
 
 import com.company.platform.msvccompanies.entities.Company;
 import com.company.platform.msvccompanies.services.CompanyService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("{name}")
+    @Observed(name = "company.name")
+    @Timed(value = "company.name")
     public ResponseEntity<Company> get(@PathVariable String name) {
 //        try {
 //            Thread.sleep(5000);
@@ -28,6 +32,8 @@ public class CompanyController {
 
 
     @PostMapping
+    @Observed(name = "company.save")
+    @Timed(value = "company.save")
     public ResponseEntity<Company> post(@RequestBody Company company) {
         log.info("POST: company {}", company.getName());
         return ResponseEntity.ok(companyService.create(company));

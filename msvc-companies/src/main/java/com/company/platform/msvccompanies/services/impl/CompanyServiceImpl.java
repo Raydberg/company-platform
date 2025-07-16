@@ -4,6 +4,7 @@ import com.company.platform.msvccompanies.entities.Category;
 import com.company.platform.msvccompanies.entities.Company;
 import com.company.platform.msvccompanies.repository.CompanyRepository;
 import com.company.platform.msvccompanies.services.CompanyService;
+import io.micrometer.tracing.Tracer;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,10 +20,19 @@ import java.util.Objects;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-
+    //PARA SPAM PERSONALIZADO
+    private final Tracer tracer;
 
     @Override
     public Company readByName(String name) {
+        //Para spam personalizado
+        var spam = tracer.nextSpan().name("readByName");
+        //Span actual
+        try (Tracer.SpanInScope spanInScope = tracer.withSpan(spam.start())) {
+            log.info("Getting company form DB");
+        } finally {
+            spam.end();
+        }
         return companyRepository.findByName(name)
                 .orElseThrow(() -> new NoSuchElementException("Company not found"));
     }
