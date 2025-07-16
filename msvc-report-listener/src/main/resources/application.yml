@@ -2,14 +2,14 @@ spring:
   application:
     name: msvc-report-listener
   config:
-    import: optional:configserver:http://localhost:7777
+    import: optional:configserver:http://config-server:7777
   profiles:
     default: default
   cloud:
     stream:
       kafka:
         binder:
-          brokers: localhost:9092
+          brokers: msg-broker:9092
       function:
         bindings:
           #Relaciones de entrada y salidas
@@ -21,13 +21,13 @@ spring:
       database: sa
       username: sa
       authentication-database: admin
-      host: localhost
+      host: mongo-db
       port: 27017
 eureka:
   instance:
     instance-id: "${spring.application.name}:${random.value}"
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
 server:
   port: 9093

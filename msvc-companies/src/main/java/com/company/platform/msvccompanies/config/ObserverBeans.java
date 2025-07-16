@@ -69,7 +69,7 @@ public class ObserverBeans {
     public LogRecordProcessor logRecordProcessor() {
         var otlpLogRecord = OtlpGrpcLogRecordExporter
                 .builder()
-                .setEndpoint("http://localhost:4317")
+                .setEndpoint("http://otel-collector:4317")
                 .build();
 
         return BatchLogRecordProcessor

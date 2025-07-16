@@ -2,7 +2,7 @@ spring:
   application:
     name: msvc-report-ms
   config:
-    import: optional:configserver:http://localhost:7777
+    import: optional:configserver:http://config-server:7777
   devtools:
     restart:
       enabled: true
@@ -27,7 +27,7 @@ eureka:
     instance-id: "${spring.application.name}:${random.value}"
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
 server:
   servlet:
     context-path: /msvc-report-ms
